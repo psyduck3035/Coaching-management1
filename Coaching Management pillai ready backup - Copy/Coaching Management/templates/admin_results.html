@@ -1,0 +1,102 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #4e73df, #1cc88a);
+        color: white;
+        padding: 24px;
+        border-radius: 16px;
+        margin-bottom: 30px;
+    }
+
+    .results-table thead th {
+        background-color: #f8f9fc;
+        font-weight: 600;
+    }
+
+    .results-table tbody tr:hover {
+        background-color: #f1f5ff;
+    }
+
+    .marks-badge {
+        font-size: 0.9rem;
+        padding: 6px 10px;
+        border-radius: 10px;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- HEADER -->
+    <div class="page-header shadow-sm">
+        <h4 class="fw-bold mb-1">Exam Results</h4>
+        <small class="opacity-75">
+            Academic performance overview of students
+        </small>
+    </div>
+
+    <!-- RESULTS TABLE -->
+    <div class="card border-0 shadow rounded-4">
+        <div class="card-body">
+
+            <div class="table-responsive">
+                <table class="table align-middle results-table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Student</th>
+                            <th>Class</th>
+                            <th>Subject</th>
+                            <th>Exam</th>
+                            <th class="text-center">Marks</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        {% for row in data %}
+                        <tr>
+                            <td class="fw-semibold">{{ row.name }}</td>
+                            <td>
+                                <span class="badge bg-primary bg-opacity-10 text-primary">
+                                    Class {{ row.class }}
+                                </span>
+                            </td>
+                            <td>{{ row.subject }}</td>
+                            <td>{{ row.exam_name }}</td>
+                            <td class="text-center">
+
+                                {% if row.marks >= 75 %}
+                                    <span class="marks-badge bg-success bg-opacity-10 text-success">
+                                        {{ row.marks }}
+                                    </span>
+                                {% elif row.marks >= 40 %}
+                                    <span class="marks-badge bg-warning bg-opacity-10 text-warning">
+                                        {{ row.marks }}
+                                    </span>
+                                {% else %}
+                                    <span class="marks-badge bg-danger bg-opacity-10 text-danger">
+                                        {{ row.marks }}
+                                    </span>
+                                {% endif %}
+
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center text-muted py-4">
+                                No exam results available
+                            </td>
+                        </tr>
+                        {% endfor %}
+
+                    </tbody>
+                </table>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

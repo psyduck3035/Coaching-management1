@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block content %}
+
+<div class="container-fluid">
+
+    <div class="page-header mb-4"
+         style="background:linear-gradient(135deg,#4e73df,#1cc88a);
+                color:white;padding:22px;border-radius:14px;">
+        <div>
+            <h4 class="fw-bold mb-0">{{ student.name }}</h4>
+            <small class="opacity-75">Student Profile</small>
+        </div>
+        <a href="/admin/students" class="btn btn-light">
+            ← Back
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- BASIC INFO -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="fw-semibold mb-3">Basic Information</h5>
+
+                    <p><strong>Email:</strong> {{ student.email }}</p>
+                    <p><strong>Class:</strong> Class {{ student.class }}</p>
+                    <p><strong>Gender:</strong> {{ student.gender }}</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- ATTENDANCE SUMMARY -->
+        <div class="col-md-6">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+                    <h5 class="fw-semibold mb-3">Attendance Summary</h5>
+
+                    <p><strong>Total Days:</strong> {{ attendance.total }}</p>
+                    <p><strong>Present Days:</strong> {{ attendance.present }}</p>
+                    <p>
+                        <strong>Attendance %:</strong>
+                        <span class="badge
+                            {% if percentage >= 75 %}
+                                bg-success
+                            {% else %}
+                                bg-danger
+                            {% endif %}">
+                            {{ percentage }}%
+                        </span>
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
