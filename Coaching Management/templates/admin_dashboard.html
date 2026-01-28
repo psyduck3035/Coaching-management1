@@ -1,0 +1,228 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    /* HEADER */
+    .dashboard-header {
+        background: linear-gradient(135deg, #4e73df, #1cc88a);
+        color: white;
+        padding: 26px;
+        border-radius: 16px;
+        margin-bottom: 30px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    /* STAT CARDS */
+    .stat-card {
+        border-radius: 14px;
+        transition: 0.3s;
+    }
+    .stat-card:hover {
+        transform: translateY(-6px);
+        box-shadow: 0 15px 30px rgba(0,0,0,0.12);
+    }
+    .stat-icon {
+        width: 52px;
+        height: 52px;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: white;
+        margin-bottom: 8px;
+    }
+
+    /* LEFT PANEL */
+    .side-panel {
+        border-radius: 18px;
+    }
+    .side-panel a {
+        border-radius: 12px;
+        padding: 12px 14px;
+        font-weight: 500;
+        margin-bottom: 10px;
+        text-align: left;
+    }
+
+    /* QUICK ACTIONS */
+    .quick-actions a {
+        border-radius: 12px;
+        padding: 10px 14px;
+        font-size: 0.95rem;
+    }
+
+    /* TABLE */
+    .data-table thead th {
+        background: #f8f9fc;
+        font-weight: 600;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- HEADER -->
+    <div class="dashboard-header">
+        <div class="d-flex align-items-center">
+            <svg width="44" height="44" viewBox="0 0 50 50" class="me-3">
+                <rect x="0" y="5" rx="12" ry="12" width="50" height="40" fill="#ffffff"/>
+                <path d="M25 15 C18 15,15 20,15 25 C15 32,22 35,25 40
+                         C28 35,35 32,35 25 C35 20,32 15,25 15Z"
+                      fill="#1cc88a"/>
+            </svg>
+            <div>
+                <h4 class="fw-bold mb-0">Mindseed Admin Dashboard</h4>
+                <small class="opacity-75">Smart school management overview</small>
+            </div>
+        </div>
+        <i class="fa-solid fa-chart-line fa-2x opacity-75"></i>
+    </div>
+
+    <!-- STATS -->
+    <div class="row g-3 mb-4">
+        <div class="col-md-3">
+            <div class="card stat-card text-center border-0">
+                <div class="card-body">
+                    <div class="stat-icon bg-primary mx-auto">
+                        <i class="fa-solid fa-users"></i>
+                    </div>
+                    <small class="text-muted">Students</small>
+                    <h4 class="fw-bold">{{ students }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card text-center border-0">
+                <div class="card-body">
+                    <div class="stat-icon bg-success mx-auto">
+                        <i class="fa-solid fa-chalkboard-user"></i>
+                    </div>
+                    <small class="text-muted">Teachers</small>
+                    <h4 class="fw-bold">{{ teachers }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card text-center border-0">
+                <div class="card-body">
+                    <div class="stat-icon bg-warning mx-auto">
+                        <i class="fa-solid fa-school"></i>
+                    </div>
+                    <small class="text-muted">Classes</small>
+                    <h4 class="fw-bold">{{ classes }}</h4>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-3">
+            <div class="card stat-card text-center border-0">
+                <div class="card-body">
+                    <div class="stat-icon bg-danger mx-auto">
+                        <i class="fa-solid fa-calendar-plus"></i>
+                    </div>
+                    <small class="text-muted">Extra Lectures</small>
+                    <h4 class="fw-bold">{{ extra_lectures }}</h4>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MAIN LAYOUT -->
+    <div class="row g-4">
+
+        <!-- LEFT MANAGEMENT PANEL -->
+        <div class="col-md-3">
+            <div class="card side-panel border-0 shadow-sm">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Management</h6>
+
+                    <a href="/admin/students" class="btn btn-outline-primary w-100">
+                        <i class="fa-solid fa-users me-2"></i> Students
+                    </a>
+
+                    <a href="/admin/teachers" class="btn btn-outline-success w-100">
+                        <i class="fa-solid fa-chalkboard-user me-2"></i> Teachers
+                    </a>
+
+                    <a href="/admin/set_fees" class="btn btn-outline-warning w-100">
+                        <i class="fa-solid fa-money-check-dollar me-2"></i> Class Fees
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <!-- RIGHT CONTENT -->
+        <div class="col-md-9">
+
+            <!-- QUICK ACTIONS -->
+            <div class="card border-0 shadow-sm rounded-4 mb-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Quick Actions</h6>
+                    <div class="d-flex flex-wrap gap-2 quick-actions">
+                        <a href="/timetable" class="btn btn-primary">
+                            <i class="fa-solid fa-calendar-days me-1"></i> Timetable
+                        </a>
+
+                        <a href="/admin/attendance_report" class="btn btn-secondary">
+                            <i class="fa-solid fa-clipboard-check me-1"></i> Attendance
+                        </a>
+
+                        <a href="/admin/results_report" class="btn btn-success">
+                            <i class="fa-solid fa-chart-column me-1"></i> Results
+                        </a>
+
+                        <a href="/admin/fees_report" class="btn btn-warning">
+                            <i class="fa-solid fa-indian-rupee-sign me-1"></i> Fees
+                        </a>
+
+                        <a href="/admin/extra_lectures" class="btn btn-danger">
+                        <i class="fa-solid fa-calendar-plus me-1"></i> Extra Lectures
+                        </a>
+
+                    </div>
+                </div>
+            </div>
+
+            <!-- CLASS DISTRIBUTION -->
+            <div class="card border-0 shadow-sm rounded-4">
+                <div class="card-body">
+                    <h6 class="fw-bold mb-3">Class-wise Student Distribution</h6>
+
+                    <div class="table-responsive">
+                        <table class="table data-table align-middle mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Total Students</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for row in classwise %}
+                                <tr>
+                                    <td>Class {{ row.class }}</td>
+                                    <td class="fw-semibold">{{ row.count }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted">
+                                        No data available
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+</div>
+
+{% endblock %}

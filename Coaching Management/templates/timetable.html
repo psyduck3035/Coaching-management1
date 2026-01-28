@@ -1,0 +1,143 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<!-- PAGE HEADER -->
+<div class="p-4 mb-4 rounded-4 text-white d-flex align-items-center justify-content-between"
+     style="background: linear-gradient(135deg, #4e73df, #1cc88a);">
+
+    <div class="d-flex align-items-center">
+        <!-- LOGO -->
+        <svg width="44" height="44" viewBox="0 0 50 50" class="me-3">
+            <rect x="0" y="5" rx="12" ry="12" width="50" height="40" fill="#ffffff"/>
+            <path d="M25 15 
+                     C18 15, 15 20, 15 25 
+                     C15 32, 22 35, 25 40 
+                     C28 35, 35 32, 35 25 
+                     C35 20, 32 15, 25 15Z"
+                  fill="#1cc88a"/>
+        </svg>
+
+        <div>
+            <h3 class="fw-bold mb-1">Class Timetable</h3>
+            <p class="mb-0 opacity-75">
+                Day-wise class schedule overview
+            </p>
+        </div>
+    </div>
+
+    <i class="fa-solid fa-calendar-days fa-2x opacity-75"></i>
+</div>
+
+<!-- DAY TABS -->
+<ul class="nav nav-pills mb-4 gap-2" role="tablist">
+    {% set days = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday'] %}
+    {% for d in days %}
+    <li class="nav-item">
+        <button class="nav-link {% if loop.first %}active{% endif %}"
+                data-bs-toggle="pill"
+                data-bs-target="#{{ d }}">
+            {{ d }}
+        </button>
+    </li>
+    {% endfor %}
+</ul>
+
+<!-- TAB CONTENT -->
+<div class="tab-content">
+
+    {% for d in days %}
+    <div class="tab-pane fade {% if loop.first %}show active{% endif %}" id="{{ d }}">
+
+        <div class="card border-0 shadow rounded-4">
+            <div class="card-body p-0">
+
+                <div class="table-responsive">
+                    <table class="table align-middle mb-0 timetable-table">
+                        <thead>
+                            <tr>
+                                <th>Class</th>
+                                <th>Subject</th>
+                                <th>Teacher</th>
+                                <th>Time</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+
+                            {% set found = false %}
+                            {% for row in timetable %}
+                                {% if row.day == d %}
+                                    {% set found = true %}
+                                    <tr>
+                                        <td>
+                                            <span class="badge bg-primary bg-opacity-10 text-primary">
+                                                Class {{ row.class }}
+                                            </span>
+                                        </td>
+                                        <td class="fw-semibold">
+                                            <i class="fa-solid fa-book-open me-1 text-secondary"></i>
+                                            {{ row.subject }}
+                                        </td>
+                                        <td>
+                                            <i class="fa-solid fa-chalkboard-user me-1 text-secondary"></i>
+                                            {{ row.teacher }}
+                                        </td>
+                                        <td>
+                                            <i class="fa-solid fa-clock me-1 text-secondary"></i>
+                                            <strong>{{ row.start_time }}</strong> – {{ row.end_time }}
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                            {% endfor %}
+
+                            {% if not found %}
+                            <tr>
+                                <td colspan="4" class="text-center text-muted py-4">
+                                    No classes scheduled for {{ d }}
+                                </td>
+                            </tr>
+                            {% endif %}
+
+                        </tbody>
+                    </table>
+                </div>
+
+            </div>
+        </div>
+
+    </div>
+    {% endfor %}
+
+</div>
+
+<!-- STYLES -->
+<style>
+    .nav-pills .nav-link {
+        border-radius: 12px;
+        padding: 10px 18px;
+        font-weight: 500;
+    }
+
+    .nav-pills .nav-link.active {
+        background: linear-gradient(135deg, #4e73df, #1cc88a);
+    }
+
+    .timetable-table thead {
+        background-color: #f8f9fc;
+    }
+
+    .timetable-table th {
+        font-weight: 600;
+        padding: 14px;
+        color: #495057;
+    }
+
+    .timetable-table td {
+        padding: 14px;
+    }
+
+    .timetable-table tbody tr:hover {
+        background-color: #f1f5ff;
+    }
+</style>
+
+{% endblock %}

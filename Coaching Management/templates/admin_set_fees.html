@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<style>
+    .page-header {
+        background: linear-gradient(135deg, #4e73df, #1cc88a);
+        color: white;
+        padding: 22px 28px;
+        border-radius: 14px;
+        margin-bottom: 25px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .form-card {
+        border-radius: 16px;
+    }
+
+    .fee-table th {
+        background-color: #f8f9fc;
+        font-weight: 600;
+    }
+
+    .fee-table tbody tr:hover {
+        background-color: #f1f5ff;
+    }
+</style>
+
+<div class="container-fluid">
+
+    <!-- HEADER -->
+    <div class="page-header shadow-sm">
+        <div>
+            <h4 class="fw-bold mb-0">Set Class Fees</h4>
+            <small class="opacity-75">
+                Define or update fee structure for each class
+            </small>
+        </div>
+
+        <a href="/admin" class="btn btn-light fw-semibold">
+            <i class="fa-solid fa-arrow-left me-1"></i> Dashboard
+        </a>
+    </div>
+
+    <div class="row g-4">
+
+        <!-- FEE FORM -->
+        <div class="col-md-4">
+            <div class="card form-card shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="fw-semibold mb-3">Add / Update Fees</h5>
+
+                    <form method="POST" class="row g-3">
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Class</label>
+                            <input type="number" name="class"
+                                   class="form-control"
+                                   placeholder="Enter class number"
+                                   required>
+                        </div>
+
+                        <div class="col-12">
+                            <label class="form-label fw-semibold">Fee Amount (₹)</label>
+                            <input type="number" name="amount"
+                                   class="form-control"
+                                   placeholder="Enter amount"
+                                   required>
+                        </div>
+
+                        <div class="col-12">
+                            <button class="btn btn-primary w-100">
+                                <i class="fa-solid fa-floppy-disk me-1"></i>
+                                Save Fees
+                            </button>
+                        </div>
+
+                    </form>
+
+                </div>
+            </div>
+        </div>
+
+        <!-- FEE TABLE -->
+        <div class="col-md-8">
+            <div class="card shadow-sm border-0 rounded-4">
+                <div class="card-body">
+
+                    <h5 class="fw-semibold mb-3">Class Fee Structure</h5>
+
+                    <div class="table-responsive">
+                        <table class="table align-middle fee-table mb-0">
+                            <thead>
+                                <tr>
+                                    <th>Class</th>
+                                    <th>Fee Amount</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+
+                                {% for f in fees %}
+                                <tr>
+                                    <td>Class {{ f.class }}</td>
+                                    <td class="fw-semibold">₹ {{ f.amount }}</td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="2" class="text-center text-muted py-3">
+                                        No fee structure found
+                                    </td>
+                                </tr>
+                                {% endfor %}
+
+                            </tbody>
+                        </table>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}
