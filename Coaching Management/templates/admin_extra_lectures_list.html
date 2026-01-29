@@ -31,6 +31,7 @@
                             <th>Day</th>
                             <th>Date</th>
                             <th>Time</th>
+                            <th>Actions</th> <!-- ✅ NEW -->
                         </tr>
                     </thead>
 
@@ -60,10 +61,22 @@
                                     {{ l.end_time }}
                                 </span>
                             </td>
+
+                            <!-- ✅ DELETE BUTTON -->
+                            <td>
+                                <form method="POST"
+                                      action="/admin/delete_extra_lecture/{{ l.timetable_id }}"
+                                      onsubmit="return confirm('Are you sure you want to delete this extra lecture?');">
+                                    <button class="btn btn-danger btn-sm">
+                                        🗑 Delete
+                                    </button>
+                                </form>
+                            </td>
                         </tr>
+
                         {% else %}
                         <tr>
-                            <td colspan="6" class="py-5">
+                            <td colspan="7" class="py-5">
                                 <div class="text-muted">
                                     <h6 class="fw-semibold mb-1">No Extra Lectures</h6>
                                     <small>Click “Schedule” to add one</small>
