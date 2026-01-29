@@ -736,7 +736,7 @@ def admin_extra_lecture():
                 flash("Lecture time clashes with existing schedule", "danger")
                 return redirect('/admin/extra_lecture')
 
-            # ✅ INSERT EXTRA LECTURE (status FIXED)
+            # ✅ INSERT EXTRA LECTURE
             cursor.execute("""
                 INSERT INTO timetable
                 (
@@ -761,7 +761,14 @@ def admin_extra_lecture():
                 date
             ))
 
+            # ✅ THIS IS THE KEY PART (timetable_id)
+            timetable_id = cursor.lastrowid
+
             conn.commit()
+
+            # (Optional but useful for debugging)
+            print("Extra lecture inserted with timetable_id:", timetable_id)
+
             flash("Extra lecture scheduled successfully", "success")
             return redirect('/admin')
 
@@ -1208,6 +1215,7 @@ def timetable():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
