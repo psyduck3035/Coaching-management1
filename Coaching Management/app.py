@@ -1,3 +1,6 @@
+from datetime import datetime
+from datetime import datetime
+import pytz
 from flask import Flask, render_template, request, redirect, session, flash, abort
 from db_config import get_db_connection
 from datetime import datetime
@@ -420,9 +423,12 @@ def teacher_dashboard():
 @login_required
 @role_required('teacher')
 def today_lectures():
-    now = datetime.now()
+    ist = pytz.timezone("Asia/Kolkata")
+    now = datetime.now(ist)
+    
     day = now.strftime('%A')
     current_time = now.time()
+
     teacher_id = session['user']['teacher_id']
 
     conn = cursor = None
@@ -493,7 +499,9 @@ def attendance(class_no):
         cursor = conn.cursor(dictionary=True)
 
         if request.method == 'POST':
-            date = datetime.now().date()
+            ist = pytz.timezone("Asia/Kolkata")
+            date = datetime.now(ist).date()
+
             for k, v in request.form.items():
                 if k.startswith("student_"):
                     sid = k.split("_")[1]
@@ -1139,3 +1147,4 @@ def timetable():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
