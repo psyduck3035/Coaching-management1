@@ -3,93 +3,75 @@
 
 <div class="container-fluid">
 
-    <!-- Page Header Card -->
-    <div class="card border-0 shadow-sm mb-4"
+    <!-- Header (Same style as Timetable) -->
+    <div class="mb-4 p-4 rounded-4 shadow-sm"
          style="background: linear-gradient(90deg,#4f7cff,#2ec4b6);">
-        <div class="card-body text-white d-flex justify-content-between align-items-center">
+        <div class="d-flex justify-content-between align-items-center text-white">
             <div>
                 <h4 class="fw-bold mb-1">Extra Lectures</h4>
-                <small>Manage and schedule additional classes</small>
+                <small>Additional class schedule overview</small>
             </div>
-            <a href="/admin/extra_lecture" class="btn btn-light fw-semibold">
-                ➕ Schedule
-            </a>
+            <i class="bi bi-calendar-plus fs-2"></i>
         </div>
     </div>
 
-    <!-- Table Card -->
-    <div class="card border-0 shadow-sm">
-        <div class="card-body">
+    <!-- Extra Lecture List -->
+    <div class="table-responsive">
+        <table class="table align-middle table-hover">
+            <thead class="table-light">
+                <tr>
+                    <th>Class</th>
+                    <th>Subject</th>
+                    <th>Teacher</th>
+                    <th>Day</th>
+                    <th>Date</th>
+                    <th>Time</th>
+                </tr>
+            </thead>
 
-            <div class="table-responsive">
-                <table class="table align-middle table-hover">
-                    <thead class="table-light text-center">
-                        <tr>
-                            <th>Class</th>
-                            <th>Subject</th>
-                            <th>Teacher</th>
-                            <th>Day</th>
-                            <th>Date</th>
-                            <th>Time</th>
-                            <th>Actions</th> <!-- ✅ NEW -->
-                        </tr>
-                    </thead>
+            <tbody>
+                {% for l in lectures %}
+                <tr>
+                    <td>
+                        <span class="badge bg-primary-subtle text-primary">
+                            Class {{ l.class }}
+                        </span>
+                    </td>
 
-                    <tbody class="text-center">
-                        {% for l in lectures %}
-                        <tr>
-                            <td class="fw-semibold">Class {{ l.class }}</td>
+                    <td class="fw-semibold">
+                        📘 {{ l.subject }}
+                    </td>
 
-                            <td>{{ l.subject }}</td>
+                    <td>
+                        👨‍🏫 {{ l.teacher }}
+                    </td>
 
-                            <td>{{ l.teacher }}</td>
+                    <td>
+                        <span class="badge rounded-pill bg-info text-dark">
+                            {{ l.day }}
+                        </span>
+                    </td>
 
-                            <td>
-                                <span class="badge rounded-pill bg-info text-dark">
-                                    {{ l.day }}
-                                </span>
-                            </td>
+                    <td>
+                        {{ l.lecture_date }}
+                    </td>
 
-                            <td>{{ l.lecture_date }}</td>
+                    <td>
+                        <i class="bi bi-clock"></i>
+                        <strong>{{ l.start_time }}</strong> – {{ l.end_time }}
+                    </td>
+                </tr>
 
-                            <td>
-                                <span class="badge bg-success">
-                                    {{ l.start_time }}
-                                </span>
-                                -
-                                <span class="badge bg-success">
-                                    {{ l.end_time }}
-                                </span>
-                            </td>
-
-                            <!-- ✅ DELETE BUTTON -->
-                            <td>
-                                <form method="POST"
-                                      action="/admin/delete_extra_lecture/{{ l.timetable_id }}"
-                                      onsubmit="return confirm('Are you sure you want to delete this extra lecture?');">
-                                    <button class="btn btn-danger btn-sm">
-                                        🗑 Delete
-                                    </button>
-                                </form>
-                            </td>
-                        </tr>
-
-                        {% else %}
-                        <tr>
-                            <td colspan="7" class="py-5">
-                                <div class="text-muted">
-                                    <h6 class="fw-semibold mb-1">No Extra Lectures</h6>
-                                    <small>Click “Schedule” to add one</small>
-                                </div>
-                            </td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-
-                </table>
-            </div>
-
-        </div>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center py-5 text-muted">
+                        <h6>No Extra Lectures Scheduled</h6>
+                        <small>Scheduled extra classes will appear here</small>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
     </div>
 
 </div>
