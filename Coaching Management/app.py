@@ -422,10 +422,12 @@ def teacher_dashboard():
 @login_required
 @role_required('teacher')
 def today_lectures():
+    # ✅ Force India timezone (Render runs in UTC)
     ist = pytz.timezone("Asia/Kolkata")
     now = datetime.now(ist)
-    
-    day = now.strftime('%A')
+
+    today_date = now.date()
+    today_day = now.strftime('%A')
     current_time = now.time()
 
     teacher_id = session['user']['teacher_id']
@@ -435,23 +437,36 @@ def today_lectures():
         conn = get_db_connection()
         cursor = conn.cursor(dictionary=True)
 
+        # ✅ FIX: handle BOTH normal + extra lectures
         cursor.execute("""
             SELECT * FROM timetable
-            WHERE teacher_id=%s AND day=%s
-        """, (teacher_id, day))
+            WHERE teacher_id = %s
+              AND (
+                    (lecture_date IS NULL AND day = %s)
+                 OR (lecture_date = %s)
+              )
+        """, (teacher_id, today_day, today_date))
 
         lecture = None
         for row in cursor.fetchall():
             start = (datetime.min + row['start_time']).time()
             end = (datetime.min + row['end_time']).time()
+
+            # ✅ Check running lecture window
             if start <= current_time <= end:
                 lecture = row
                 break
 
-        return render_template('today_lectures.html', lecture=lecture)
+        return render_template(
+            'today_lectures.html',
+            lecture=lecture
+        )
+
     finally:
-        if cursor: cursor.close()
-        if conn: conn.close()
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
 
 #Add marks
 @app.route('/add_marks', methods=['GET','POST'])
@@ -1153,6 +1168,7 @@ def timetable():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
