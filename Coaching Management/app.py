@@ -694,7 +694,10 @@ def admin_teacher_profile(teacher_id):
         if cursor: cursor.close()
         if conn: conn.close()
 #Admin Extra Lecture 
-# Admin Extra Lecture 
+# ======================================================
+# ADMIN EXTRA LECTURE (FINAL REBUILT VERSION)
+# ======================================================
+
 @app.route('/admin/extra_lecture', methods=['GET', 'POST'])
 @login_required
 @role_required('admin')
@@ -707,24 +710,21 @@ def admin_extra_lecture():
         if request.method == 'POST':
             class_no = request.form['class']
             teacher_id = request.form['teacher_id']
+            subject = request.form['subject']
             date = request.form['date']
             start = request.form['start_time']
             end = request.form['end_time']
 
-            # ✅ derive correct day from date (NO DB change)
+            # ✅ Derive correct day from date (NO DB change)
             day = datetime.strptime(date, "%Y-%m-%d").strftime('%A')
 
-            # CLASH CHECK (Teacher OR Class)
+            # ✅ Clash check (teacher OR class)
             cursor.execute("""
-                SELECT 1 FROM timetable
+                SELECT 1
+                FROM timetable
                 WHERE
-                    (
-                        teacher_id=%s OR class=%s
-                    )
-                    AND (
-                        lecture_date=%s
-                        OR lecture_date IS NULL
-                    )
+                    (teacher_id = %s OR class = %s)
+                    AND lecture_date = %s
                     AND (
                         (%s BETWEEN start_time AND end_time)
                         OR (%s BETWEEN start_time AND end_time)
@@ -736,18 +736,26 @@ def admin_extra_lecture():
                 flash("Lecture time clashes with existing schedule", "danger")
                 return redirect('/admin/extra_lecture')
 
-            # INSERT EXTRA LECTURE
+            # ✅ INSERT EXTRA LECTURE (status FIXED)
             cursor.execute("""
                 INSERT INTO timetable
-                (class, subject, teacher_id, day,
-                 start_time, end_time,
-                 lecture_date, is_extra)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,1)
+                (
+                    class,
+                    subject,
+                    teacher_id,
+                    day,
+                    start_time,
+                    end_time,
+                    lecture_date,
+                    is_extra,
+                    status
+                )
+                VALUES (%s, %s, %s, %s, %s, %s, %s, 1, 'Active')
             """, (
                 class_no,
-                request.form['subject'],
+                subject,
                 teacher_id,
-                day,      # ✅ correct day
+                day,
                 start,
                 end,
                 date
@@ -757,7 +765,7 @@ def admin_extra_lecture():
             flash("Extra lecture scheduled successfully", "success")
             return redirect('/admin')
 
-        # GET request
+        # ✅ GET request (load teachers)
         cursor.execute("SELECT teacher_id, name FROM teachers")
         teachers = cursor.fetchall()
 
@@ -772,6 +780,38 @@ def admin_extra_lecture():
         if conn:
             conn.close()
 
+#delete Extra lecture 
+@app.route('/admin/delete_extra_lecture/<int:timetable_id>', methods=['POST'])
+@login_required
+@role_required('admin')
+def delete_extra_lecture(timetable_id):
+    conn = cursor = None
+    try:
+        conn = get_db_connection()
+        cursor = conn.cursor()
+
+        # ✅ HARD DELETE (extra lectures only)
+        cursor.execute("""
+            DELETE FROM timetable
+            WHERE timetable_id = %s
+              AND is_extra = 1
+        """, (timetable_id,))
+
+        conn.commit()
+        flash("Extra lecture deleted successfully", "success")
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        flash("Failed to delete extra lecture", "danger")
+
+    finally:
+        if cursor:
+            cursor.close()
+        if conn:
+            conn.close()
+
+    return redirect('/admin/extra_lectures')
 
 #Create a VIEW route for Extra Lectures
 @app.route('/admin/extra_lectures')
@@ -1168,6 +1208,7 @@ def timetable():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
