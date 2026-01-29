@@ -1,5 +1,4 @@
 from datetime import datetime
-from datetime import datetime
 import pytz
 from flask import Flask, render_template, request, redirect, session, flash, abort
 from db_config import get_db_connection
@@ -690,54 +689,57 @@ def admin_extra_lecture():
         cursor = conn.cursor(dictionary=True)
 
         if request.method == 'POST':
-            class_no = request.form['class']
-            teacher_id = request.form['teacher_id']
-            date = request.form['date']
-            start = request.form['start_time']
-            end = request.form['end_time']
+    class_no = request.form['class']
+    teacher_id = request.form['teacher_id']
+    date = request.form['date']
+    start = request.form['start_time']
+    end = request.form['end_time']
 
-            # CLASH CHECK (Teacher OR Class)
-            cursor.execute("""
-                SELECT 1 FROM timetable
-                WHERE
-                    (
-                        teacher_id=%s OR class=%s
-                    )
-                    AND (
-                        lecture_date=%s
-                        OR lecture_date IS NULL
-                    )
-                    AND (
-                        (%s BETWEEN start_time AND end_time)
-                        OR (%s BETWEEN start_time AND end_time)
-                        OR (start_time BETWEEN %s AND %s)
-                    )
-            """, (teacher_id, class_no, date, start, end, start, end))
+    # ✅ derive correct day from date (NO DB change)
+    day = datetime.strptime(date, "%Y-%m-%d").strftime('%A')
 
-            if cursor.fetchone():
-                flash("Lecture time clashes with existing schedule", "danger")
-                return redirect('/admin/extra_lecture')
+    # CLASH CHECK (Teacher OR Class)
+    cursor.execute("""
+        SELECT 1 FROM timetable
+        WHERE
+            (
+                teacher_id=%s OR class=%s
+            )
+            AND (
+                lecture_date=%s
+                OR lecture_date IS NULL
+            )
+            AND (
+                (%s BETWEEN start_time AND end_time)
+                OR (%s BETWEEN start_time AND end_time)
+                OR (start_time BETWEEN %s AND %s)
+            )
+    """, (teacher_id, class_no, date, start, end, start, end))
 
-            # INSERT EXTRA LECTURE
-            cursor.execute("""
-                INSERT INTO timetable
-                (class, subject, teacher_id, day,
-                 start_time, end_time,
-                 lecture_date, is_extra)
-                VALUES (%s,%s,%s,%s,%s,%s,%s,1)
-            """, (
-                class_no,
-                request.form['subject'],
-                teacher_id,
-                request.form['day'],
-                start,
-                end,
-                date
-            ))
+    if cursor.fetchone():
+        flash("Lecture time clashes with existing schedule", "danger")
+        return redirect('/admin/extra_lecture')
 
-            conn.commit()
-            flash("Extra lecture scheduled successfully", "success")
-            return redirect('/admin')
+    # INSERT EXTRA LECTURE
+    cursor.execute("""
+        INSERT INTO timetable
+        (class, subject, teacher_id, day,
+         start_time, end_time,
+         lecture_date, is_extra)
+        VALUES (%s,%s,%s,%s,%s,%s,%s,1)
+    """, (
+        class_no,
+        request.form['subject'],
+        teacher_id,
+        day,        # ✅ FIXED HERE
+        start,
+        end,
+        date
+    ))
+
+    conn.commit()
+    flash("Extra lecture scheduled successfully", "success")
+    return redirect('/admin')
 
         # GET
         cursor.execute("SELECT teacher_id, name FROM teachers")
@@ -1147,4 +1149,5 @@ def timetable():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
