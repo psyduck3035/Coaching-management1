@@ -6,6 +6,13 @@ from datetime import datetime
 from functools import wraps
 
 import os
+import psycopg2
+
+conn = psycopg2.connect(
+    os.getenv("DATABASE_URL"),
+    sslmode="require"
+)
+
 
 app = Flask(__name__)
 app.secret_key = os.environ.get("SECRET_KEY", "DEV_SECRET_CHANGE_ME")
@@ -1174,6 +1181,7 @@ def timetable():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
