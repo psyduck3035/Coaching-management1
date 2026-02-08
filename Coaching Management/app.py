@@ -338,7 +338,7 @@ def edit_student(id):
         if conn: conn.close()
 
 
-@app.route('/admin/delete_student/<int:id>')
+@app.route('/admin/delete_student/<int:id>', methods=['POST'])
 @login_required
 @role_required('admin')
 def delete_student(id):
@@ -346,13 +346,29 @@ def delete_student(id):
     try:
         conn = get_db_connection()
         cursor = conn.cursor()
+
+        # delete child/dependent records first
+        cursor.execute("DELETE FROM fees WHERE student_id=%s", (id,))
+        cursor.execute("DELETE FROM attendance WHERE student_id=%s", (id,))
+        cursor.execute("DELETE FROM enrollments WHERE student_id=%s", (id,))
+
+        # now delete student
         cursor.execute("DELETE FROM students WHERE student_id=%s", (id,))
         conn.commit()
-        flash("Student deleted", "success")
-        return redirect('/admin/students')
+
+        flash("Student deleted successfully", "success")
+
+    except Exception as e:
+        if conn:
+            conn.rollback()
+        print("DELETE ERROR:", e)
+        flash("Cannot delete student. Remove related records first.", "danger")
+
     finally:
         if cursor: cursor.close()
         if conn: conn.close()
+
+    return redirect('/admin/students')
 
 # ======================================================
 # ADMIN TEACHERS CRUD (SAME PATTERN)
@@ -1174,6 +1190,7 @@ def timetable():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
