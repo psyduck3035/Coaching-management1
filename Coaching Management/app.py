@@ -347,30 +347,26 @@ def delete_student(id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        print("Trying to delete student:", id)
-
-        # try deleting student directly FIRST (for debugging)
         cursor.execute("DELETE FROM students WHERE student_id=%s", (id,))
         conn.commit()
 
-        print("Rows affected:", cursor.rowcount)
-
-        if cursor.rowcount == 0:
-            flash("Student not found in database", "warning")
-        else:
+        if cursor.rowcount > 0:
             flash("Student deleted successfully", "success")
+        else:
+            flash("Student not found or already deleted", "warning")
 
     except Exception as e:
         if conn:
             conn.rollback()
-        print("DELETE ERROR FULL:", e)   # ← IMPORTANT
-        flash("Error deleting student. Check server logs.", "danger")
+        print("DELETE ERROR FINAL:", e)
+        flash("Error deleting student", "danger")
 
     finally:
         if cursor: cursor.close()
         if conn: conn.close()
 
     return redirect('/admin/students')
+
 
 # ======================================================
 # ADMIN TEACHERS CRUD (SAME PATTERN)
@@ -1192,6 +1188,7 @@ def timetable():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
