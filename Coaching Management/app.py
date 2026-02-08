@@ -347,12 +347,12 @@ def delete_student(id):
         conn = get_db_connection()
         cursor = conn.cursor()
 
-        # delete child/dependent records first
+        # delete dependent records first (prevents FK error)
         cursor.execute("DELETE FROM fees WHERE student_id=%s", (id,))
         cursor.execute("DELETE FROM attendance WHERE student_id=%s", (id,))
         cursor.execute("DELETE FROM enrollments WHERE student_id=%s", (id,))
 
-        # now delete student
+        # delete student
         cursor.execute("DELETE FROM students WHERE student_id=%s", (id,))
         conn.commit()
 
@@ -362,7 +362,7 @@ def delete_student(id):
         if conn:
             conn.rollback()
         print("DELETE ERROR:", e)
-        flash("Cannot delete student. Remove related records first.", "danger")
+        flash("Cannot delete student due to related records.", "danger")
 
     finally:
         if cursor: cursor.close()
@@ -1190,6 +1190,7 @@ def timetable():
 if __name__ == "__main__":
     port = int(os.environ.get("PORT", 5000))
     app.run(host="0.0.0.0", port=port)
+
 
 
 
